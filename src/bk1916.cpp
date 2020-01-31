@@ -17,13 +17,20 @@ typedef struct {
 	int back;
 }Link;
 
+int Vit[MAX_N];
+
 int N, L;
-int Dit[MAX_N], Vit[MAX_N];
+int Dit[MAX_N];
 map<int, vector<pair<int,int>>> Path;
 priority_queue<Link> Pq;
+bool operator<(Link a, Link b) {
+	return a.cost > b.cost;
+}
 
 int main(void) {
-	memset(Dit, INF, sizeof(Dit));
+	for (int i = 0; i < MAX_N; i++) {
+		Dit[i] = INF;
+	}
 	
 	scanf("%d %d", &N, &L);
 	for (int i = 0; i < L; i++) {
@@ -35,8 +42,8 @@ int main(void) {
 	int start, end;
 	scanf("%d %d", &start, &end);
 
-	Vit[start] = 1;
 	Dit[start] = 0;
+	Vit[start] = 1;
 	for (int i = 0; i < Path[start].size(); i++) {
 		Link link;
 		link.front = start;
@@ -50,6 +57,21 @@ int main(void) {
 		int back = Pq.top().back;
 		int cost = Pq.top().cost;
 		Pq.pop();
+
+		cost += Dit[front];
+		Dit[back] = (Dit[back] < cost) ? Dit[back] : cost;
+		for (int i = 0; i < Path[back].size(); i++) {
+			Link link;
+			link.front = back;
+			link.cost = Path[back][i].first;
+			link.back = Path[back][i].second;
+			if (Vit[link.back] == 1) continue;
+			Pq.push(link);
+		}
+
+		//if (back == end) break;
 	}
+
+	printf("%d\n", Dit[end]);
 }
 
